@@ -1,3 +1,10 @@
+export interface PokemonsHttp {
+  count: number;
+  next: string;
+  previous: any;
+  results: Pokemon[]
+}
+
 export interface PokemonsCall {
   count: number;
   next: string;
