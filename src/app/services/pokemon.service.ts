@@ -6,14 +6,10 @@ import {
 } from '../interfaces/pokemon.interfaces';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import {
-  ErrorObserver,
   Observable,
   Subject,
   catchError,
-  combineAll,
   combineLatestAll,
-  concatMap,
-  forkJoin,
   from,
   map,
   of,
@@ -37,7 +33,7 @@ export class PokemonService {
     let pokemonCall: PokemonsCall;
     let pokemons: PokemonsHttp;
 
-    const pokemonObserver = this.http
+    this.http
       .get<PokemonsCall>(url)
       .pipe(
         catchError(
@@ -50,16 +46,14 @@ export class PokemonService {
         // storing for future use
         pokemonCall = data;
 
-        // getting the pokemons from inside the pokemonCall, currently [{name: string, url: string}]
-        const unfinishedPokemons = from(data.results);
-        // unfinishedPokemons.pipe(
-        //   map(pokemonPreview => pokemonPreview.urls)
-        //   concatMap(urls => forkJoin(...urls.map((url: string) => this.getPokemonByUrl(url))))
-        // )
-        const example = from(data.results).pipe(
+        // turning {name: ..., url} to a valid pokemon information
+        // creating needed observable
+        const unfinishedPokemons = from(data.results).pipe(
           map((prev) => this.getPokemonByUrl(prev.url))
         );
-        example.pipe(combineLatestAll()).subscribe((data) => {
+
+        // subscribe to all inner observables and when all are completed writing the result into pokemonsHttp
+        unfinishedPokemons.pipe(combineLatestAll()).subscribe((data) => {
           pokemons = {
             count: pokemonCall.count,
             next: pokemonCall.next,
