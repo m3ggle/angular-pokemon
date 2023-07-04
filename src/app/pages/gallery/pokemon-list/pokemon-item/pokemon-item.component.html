@@ -1,1 +1,14 @@
-<p>pokemon-item works!</p>
+<div
+  class="w-72 flex flex-col gap-4 rounded-md bg-neutral-700 shadow hover:shadow-lg hover:rounded-2xl cursor-pointer duration-300 hover:-translate-y-1 overflow-hidden"
+  [routerLink]="'/pokemon/' + pokemon.id"
+>
+  <img
+    [src]="pokemon.sprites.front_default"
+    [alt]="'default' + pokemon.name + 'visual'"
+  />
+  <div
+    class="w-full flex bg-neutral-500 rounded-md p-6 justify-center text-xl"
+  >
+    <span>{{ pokemon.name | titlecase}}</span>
+  </div>
+</div>

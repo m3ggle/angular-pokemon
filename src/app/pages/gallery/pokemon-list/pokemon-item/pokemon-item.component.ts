@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
+import { Pokemon } from 'src/app/interfaces/pokemon.interfaces';
 
 @Component({
   selector: 'app-pokemon-item',
@@ -6,5 +7,5 @@ import { Component } from '@angular/core';
   styleUrls: ['./pokemon-item.component.css']
 })
 export class PokemonItemComponent {
-
+  @Input("pokemonData") pokemon!: Pokemon
 }
