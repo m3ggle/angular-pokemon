@@ -10,16 +10,18 @@ import {
   Subject,
   catchError,
   combineLatestAll,
+  concat,
   from,
   map,
   of,
 } from 'rxjs';
+import { testPokemonHttp } from '../data/collection';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PokemonService {
-  pokemonUrl = 'https://pokeapi.co/api/v2/pokemon';
+  pokemonPrefix = 'https://pokeapi.co/api/v2/pokemon';
   httpOptions = {
     headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
   };
@@ -28,13 +30,27 @@ export class PokemonService {
 
   constructor(private http: HttpClient) {}
 
-  getPokemons(offset: number = 0, limit: number = 20) {
-    const url = `${this.pokemonUrl}?offset=${offset}&limit=${limit}`;
+  getPokemons(url?: string, offset?: number, limit?: number) {
+    let pokeUrl: string = this.pokemonPrefix;
+
+    // setting the pokeUrl
+    if (url === undefined) {
+      if (offset === undefined || limit === undefined) {
+        pokeUrl = pokeUrl + '?offset=0&limit=0';
+      } else {
+        pokeUrl = pokeUrl + `?offset=${offset}&limit=${limit}`;
+      }
+    } else {
+      pokeUrl = url;
+    }
+
+    // meat
+    // const pokeUrl = `${this.pokemonPrefix}?offset=${offset}&limit=${limit}`;
     let pokemonCall: PokemonsCall;
-    let pokemons: PokemonsHttp;
+    // let pokemons: PokemonsHttp;
 
     this.http
-      .get<PokemonsCall>(url)
+      .get<PokemonsCall>(pokeUrl)
       .pipe(
         catchError(
           this.handleError<PokemonsCall>(
@@ -52,21 +68,63 @@ export class PokemonService {
           map((prev) => this.getPokemonByUrl(prev.url))
         );
 
+        let currentPokemons: Pokemon[] = [];
+        this.pokemonsHttp.pipe().subscribe((val) => {
+          currentPokemons = [];
+          console.log(currentPokemons, val.results);
+        });
+
+        console.log('hallo');
+
         // subscribe to all inner observables and when all are completed writing the result into pokemonsHttp
         unfinishedPokemons.pipe(combineLatestAll()).subscribe((data) => {
-          pokemons = {
+          const pokemons: PokemonsHttp = {
             count: pokemonCall.count,
             next: pokemonCall.next,
             previous: pokemonCall.previous,
             results: data,
-          }
-          this.pokemonsHttp.next(pokemons)
+          };
+          this.pokemonsHttp.next(pokemons);
         });
+
+        // trying to turn data.results (current pokemons) into an array
+        // of(
+        //   this.pokemonsHttp.pipe(
+        //     (data: PokemonsHttp) => {
+        //       return data.results
+        //     }
+        //   )
+        // )
+
+        // does not work, error: Expected 0-1 arguments, but got 2.
+        // combineLatestAll(
+        //   of(
+        //     this.pokemonsHttp.pipe().subscribe((data) => {
+        //       // return data.results;
+        //       return testPokemonHttp.results
+        //     })
+        //   ),
+        //   // of(testPokemonHttp.results),
+        //   // of(1,2,3),
+        //   unfinishedPokemons.pipe(combineLatestAll())
+        // ).subscribe((val) => console.log(val));
+
+        concat(
+          of(
+            this.pokemonsHttp.pipe().subscribe((data) => {
+              // return data.results;
+              return testPokemonHttp.results;
+            })
+          ),
+          // of(testPokemonHttp.results),
+          // of(1,2,3),
+          unfinishedPokemons.pipe(combineLatestAll())
+        ).subscribe((val) => console.log(val));
       });
   }
 
   getPokemonById(id: number): Observable<Pokemon> {
-    const url = `${this.pokemonUrl}/${id}`;
+    const url = `${this.pokemonPrefix}/${id}`;
     return this.http.get<Pokemon>(url).pipe(
       // clean up function
       catchError(this.handleError<Pokemon>(`gePokemonByID id=${id}`))

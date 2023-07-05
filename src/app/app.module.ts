@@ -12,6 +12,7 @@ import { BackToTopComponent } from './generalComponents/back-to-top/back-to-top.
 import { NavbarComponent } from './generalComponents/navbar/navbar.component';
 import { PokemonDetailComponent } from './pages/pokemon-detail/pokemon-detail.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
+import { IntersectionDirective } from './intersection.directive';
 
 @NgModule({
   declarations: [
@@ -24,6 +25,7 @@ import { NotFoundComponent } from './pages/not-found/not-found.component';
     NavbarComponent,
     PokemonDetailComponent,
     NotFoundComponent,
+    IntersectionDirective,
   ],
   imports: [BrowserModule, AppRoutingModule, HttpClientModule],
   providers: [],

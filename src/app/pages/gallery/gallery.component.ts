@@ -11,8 +11,8 @@ export class GalleryComponent implements OnInit {
   constructor(private pokemonService: PokemonService) {}
 
   ngOnInit(): void {
-    // this.pokemonService.getPokemons();
-    // this.pokemonService.pokemonsHttp.subscribe(data => console.log(data))
+    this.pokemonService.getPokemons();
+    this.pokemonService.pokemonsHttp.subscribe(data => console.log(data))
 
     // result.subscribe((data: PokemonsCall) => {
     //   console.log(data);
