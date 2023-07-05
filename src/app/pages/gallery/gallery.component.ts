@@ -12,7 +12,12 @@ export class GalleryComponent implements OnInit {
 
   ngOnInit(): void {
     this.pokemonService.getPokemons();
-    this.pokemonService.pokemonsHttp.subscribe(data => console.log(data))
+    this.pokemonService.pokemonsHttp.subscribe(
+      (data) => {
+        console.log(data)
+        console.log("hey")
+      }
+    );
 
     // result.subscribe((data: PokemonsCall) => {
     //   console.log(data);

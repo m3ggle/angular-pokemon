@@ -1,6 +1,6 @@
 export interface PokemonsHttp {
   count: number;
-  next: string;
+  next: any;
   previous: any;
   results: Pokemon[]
 }

@@ -16,7 +16,6 @@ export class IntersectionDirective implements OnInit, OnDestroy {
   #elementRef = inject(ElementRef)
 
   ngOnInit(): void {
-    console.log(this.#elementRef.nativeElement)
     // todo: intersection observer implementieren
   }
 
