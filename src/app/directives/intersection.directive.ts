@@ -47,7 +47,7 @@ export class IntersectionDirective implements OnInit, OnDestroy {
   }
 
   private isVisible(element: HTMLElement) {
-    return new Promise(resolve => {
+    return new Promise((resolve) => {
       /*
        - create new intersection observer which has a callback that checks if the target element is fully in view (returns the boolean) and discards it afterwards
        - start observing the target element
@@ -72,7 +72,7 @@ export class IntersectionDirective implements OnInit, OnDestroy {
       entry.isIntersecting || entry.intersectionRatio > 0;
 
     this.observer = new IntersectionObserver((entries, observer) => {
-      entries.forEach(entry => {
+      entries.forEach((entry) => {
         if (isIntersecting(entry)) {
           this.subject$.next({ entry, observer });
         }
