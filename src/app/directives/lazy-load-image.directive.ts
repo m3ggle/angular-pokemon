@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  inject,
 } from '@angular/core';
 import { Subject, delay, filter } from 'rxjs';
 
@@ -26,7 +27,7 @@ export class LazyLoadImageDirective implements OnInit, OnDestroy {
     observer: IntersectionObserver;
   }>();
 
-  constructor(private element: ElementRef<HTMLImageElement>) {}
+  private element = inject(ElementRef<HTMLImageElement>);
 
   ngOnInit() {
     if (this.decidingElement === null) {

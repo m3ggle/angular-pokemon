@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { Pokemon } from 'src/app/interfaces/pokemon.interfaces';
 import { PokemonService } from 'src/app/services/pokemon.service';
 
@@ -8,16 +8,14 @@ import { PokemonService } from 'src/app/services/pokemon.service';
   styleUrls: ['./pokemon-list.component.css'],
 })
 export class PokemonListComponent implements OnInit {
-  pokemonList: Pokemon[] = [];
-
-  constructor(private pokemonService: PokemonService) {}
+  public pokemonList: Pokemon[] = [];
+  private pokemonService = inject(PokemonService)
 
   ngOnInit(): void {
-    // this.pokemonList = testPokemonHttp.results;
-    this.pokemonService.pokemonsHttp.subscribe(newPokis => {
+    this.pokemonService.pokemonsHttp.subscribe((newPokis) => {
       if (newPokis !== null) {
-        this.pokemonList = newPokis.results
+        this.pokemonList = newPokis.results;
       }
-    })
+    });
   }
 }

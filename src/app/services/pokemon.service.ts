@@ -1,4 +1,4 @@
-import { Injectable, OnInit } from '@angular/core';
+import { Injectable, OnInit, inject } from '@angular/core';
 import {
   Pokemon,
   PokemonsCall,
@@ -8,7 +8,6 @@ import { HttpClient } from '@angular/common/http';
 import {
   BehaviorSubject,
   Observable,
-  Subject,
   catchError,
   forkJoin,
   map,
@@ -20,16 +19,49 @@ import {
   providedIn: 'root',
 })
 export class PokemonService {
-  private pokemonPrefix = 'https://pokeapi.co/api/v2/pokemon';
-  pokemonsHttp = new BehaviorSubject<PokemonsHttp | null>(null);
-  // todo: https://www.learnrxjs.io/learn-rxjs/subjects/behaviorsubject
+  private readonly pokemonPrefix = 'https://pokeapi.co/api/v2/pokemon';
+  private http = inject(HttpClient);
 
-  constructor(private http: HttpClient) {}
+  public pokemonsHttp = new BehaviorSubject<PokemonsHttp | null>(null);
 
-  getPokemons(url?: string, offset?: number, limit?: number) {
-    let pokeUrl: string = this.pokemonPrefix;
+  public getPokemons(url?: string, offset?: number, limit?: number) {
+    const pokeUrl = this.determineUrl(url, offset, limit);
 
-    // setting the pokeUrl
+    // meat of getting pokemons
+    this.http.get<PokemonsCall>(pokeUrl).pipe(
+      catchError(
+        this.handleError<PokemonsCall>(
+          `gePokemons offset=${offset} limit=${limit}`
+        )
+      ),
+      switchMap((data) => {
+        const pokeOb = data.results.map((poke) =>
+          this.getPokemonByUrl(poke.url)
+        );
+
+        let currentPokis = this.pokemonsHttp.value?.results
+          ? this.pokemonsHttp.value?.results
+          : [];
+
+        return forkJoin(pokeOb).pipe(
+          map((pokemonData) => ({
+            count: data.count,
+            next: data.next,
+            previous: data.previous,
+            results: [...currentPokis, ...pokemonData],
+          }))
+        );
+      }),
+      map((data) => {
+        this.pokemonsHttp.next(data);
+        return data;
+      })
+    );
+    // .subscribe(console.log);
+  }
+
+  private determineUrl(url?: string, offset?: number, limit?: number) {
+    let pokeUrl = this.pokemonPrefix;
     if (url === undefined) {
       if (offset === undefined || limit === undefined) {
         pokeUrl = pokeUrl + '?offset=0&limit=0';
@@ -40,44 +72,10 @@ export class PokemonService {
       pokeUrl = url;
     }
 
-    // meat
-    this.http
-      .get<PokemonsCall>(pokeUrl)
-      .pipe(
-        catchError(
-          this.handleError<PokemonsCall>(
-            `gePokemons offset=${offset} limit=${limit}`
-          )
-        ),
-
-        switchMap((data) => {
-          const pokeOb = data.results.map((poke) =>
-            this.getPokemonByUrl(poke.url)
-          );
-
-          let currentPokis = this.pokemonsHttp.value?.results
-            ? this.pokemonsHttp.value?.results
-            : [];
-
-          return forkJoin(pokeOb).pipe(
-            map((pokemonData) => ({
-              count: data.count,
-              next: data.next,
-              previous: data.previous,
-              results: [...currentPokis, ...pokemonData],
-            }))
-          );
-        }),
-
-        map((data) => {
-          this.pokemonsHttp.next(data);
-          return data;
-        })
-      )
-      .subscribe(console.log);
+    return pokeUrl;
   }
 
-  getPokemonById(id: number): Observable<Pokemon> {
+  public getPokemonById(id: number): Observable<Pokemon> {
     const url = `${this.pokemonPrefix}/${id}`;
     return this.http.get<Pokemon>(url).pipe(
       // clean up function
@@ -85,7 +83,7 @@ export class PokemonService {
     );
   }
 
-  getPokemonByUrl(url: string): Observable<Pokemon> {
+  public getPokemonByUrl(url: string): Observable<Pokemon> {
     return this.http.get<Pokemon>(url).pipe(
       // clean up function
       catchError(this.handleError<Pokemon>(`gePokemonByUrl url=${url}`))

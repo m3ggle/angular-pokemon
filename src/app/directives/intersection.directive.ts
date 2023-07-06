@@ -6,6 +6,7 @@ import {
   OnDestroy,
   OnInit,
   Output,
+  inject,
 } from '@angular/core';
 import { Subject, delay, filter } from 'rxjs';
 
@@ -25,7 +26,7 @@ export class IntersectionDirective implements OnInit, OnDestroy {
     observer: IntersectionObserver;
   }>();
 
-  constructor(private element: ElementRef) {}
+  private element = inject(ElementRef);
 
   ngOnInit() {
     this.createObserver();

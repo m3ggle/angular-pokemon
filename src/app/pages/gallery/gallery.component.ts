@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { PokemonService } from 'src/app/services/pokemon.service';
 
 @Component({
@@ -7,13 +7,13 @@ import { PokemonService } from 'src/app/services/pokemon.service';
   styleUrls: ['./gallery.component.css'],
 })
 export class GalleryComponent implements OnInit {
-  constructor(private pokemonService: PokemonService) {}
-
+  private pokemonService = inject(PokemonService)
+  
   ngOnInit(): void {
     this.pokemonService.getPokemons();
   }
 
-  onIntersected() {
+  public onIntersected() {
     this.pokemonService.getPokemons(
       this.pokemonService.pokemonsHttp.value?.next
     );

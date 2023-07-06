@@ -8,12 +8,4 @@ import { Pokemon } from 'src/app/interfaces/pokemon.interfaces';
 })
 export class PokemonItemComponent {
   @Input("pokemonData") pokemon!: Pokemon
-
-  constructor(){
-    console.log("hey")
-  }
-
-  onIntersected3() {
-    console.log(this.pokemon.name + " intercepted")
-  }
 }
