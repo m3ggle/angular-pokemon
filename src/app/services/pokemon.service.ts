@@ -1,11 +1,12 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnInit } from '@angular/core';
 import {
   Pokemon,
   PokemonsCall,
   PokemonsHttp,
 } from '../interfaces/pokemon.interfaces';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import {
+  BehaviorSubject,
   Observable,
   Subject,
   catchError,
@@ -20,11 +21,10 @@ import {
 })
 export class PokemonService {
   private pokemonPrefix = 'https://pokeapi.co/api/v2/pokemon';
-  pokemonsHttp = new Subject<PokemonsHttp>();
+  pokemonsHttp = new BehaviorSubject<PokemonsHttp | null>(null);
+  // todo: https://www.learnrxjs.io/learn-rxjs/subjects/behaviorsubject
 
-  constructor(private http: HttpClient) {
-    this.getPokemons()
-  }
+  constructor(private http: HttpClient) {}
 
   getPokemons(url?: string, offset?: number, limit?: number) {
     let pokeUrl: string = this.pokemonPrefix;
@@ -41,34 +41,40 @@ export class PokemonService {
     }
 
     // meat
-    this.http.get<PokemonsCall>(pokeUrl).pipe(
-      catchError(
-        this.handleError<PokemonsCall>(
-          `gePokemons offset=${offset} limit=${limit}`
-        )
-      ),
+    this.http
+      .get<PokemonsCall>(pokeUrl)
+      .pipe(
+        catchError(
+          this.handleError<PokemonsCall>(
+            `gePokemons offset=${offset} limit=${limit}`
+          )
+        ),
 
-      switchMap((data) => {
-        const pokeOb = data.results.map((poke) =>
-          this.getPokemonByUrl(poke.url)
-        );
+        switchMap((data) => {
+          const pokeOb = data.results.map((poke) =>
+            this.getPokemonByUrl(poke.url)
+          );
 
-        return forkJoin(pokeOb).pipe(
-          map((pokemonData) => ({
-            count: data.count,
-            next: data.next,
-            previous: data.previous,
-            results: pokemonData,
-          }))
-        );
-      }),
+          let currentPokis = this.pokemonsHttp.value?.results
+            ? this.pokemonsHttp.value?.results
+            : [];
 
-      map((data) => {
-        this.pokemonsHttp.next(data);
-        return data;
-      })
-    )
-    // .subscribe(console.log)
+          return forkJoin(pokeOb).pipe(
+            map((pokemonData) => ({
+              count: data.count,
+              next: data.next,
+              previous: data.previous,
+              results: [...currentPokis, ...pokemonData],
+            }))
+          );
+        }),
+
+        map((data) => {
+          this.pokemonsHttp.next(data);
+          return data;
+        })
+      )
+      .subscribe(console.log);
   }
 
   getPokemonById(id: number): Observable<Pokemon> {
