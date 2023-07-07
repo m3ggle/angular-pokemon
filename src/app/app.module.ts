@@ -9,11 +9,12 @@ import { PokemonListComponent } from './pages/gallery/pokemon-list/pokemon-list.
 import { PokemonItemComponent } from './pages/gallery/pokemon-list/pokemon-item/pokemon-item.component';
 import { SearchComponent } from './generalComponents/search/search.component';
 import { BackToTopComponent } from './generalComponents/back-to-top/back-to-top.component';
-import { NavbarComponent } from './generalComponents/navbar/navbar.component';
+// import { NavbarComponent } from './generalComponents/navbar/navbar.component';
 import { PokemonDetailComponent } from './pages/pokemon-detail/pokemon-detail.component';
 import { NotFoundComponent } from './pages/not-found/not-found.component';
-import { IntersectionDirective } from './directives/intersection.directive';
-import { LazyLoadImageDirective } from './directives/lazy-load-image.directive';
+import { IntersectionDirective } from './directives/intersection/intersection.directive';
+import { LazyLoadImageDirective } from './directives/lazy-load-image/lazy-load-image.directive';
+import { NavbarModule } from './generalComponents/navbar/navbar.module';
 
 @NgModule({
   declarations: [
@@ -23,13 +24,13 @@ import { LazyLoadImageDirective } from './directives/lazy-load-image.directive';
     PokemonItemComponent,
     SearchComponent,
     BackToTopComponent,
-    NavbarComponent,
+    // NavbarComponent,
     PokemonDetailComponent,
     NotFoundComponent,
     IntersectionDirective,
     LazyLoadImageDirective,
   ],
-  imports: [BrowserModule, AppRoutingModule, HttpClientModule],
+  imports: [BrowserModule, AppRoutingModule, HttpClientModule, NavbarModule],
   providers: [],
   bootstrap: [AppComponent],
 })
