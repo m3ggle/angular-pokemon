@@ -1,7 +1,7 @@
 <!-- <router-outlet></router-outlet> -->
-<div class="w-full flex flex-wrap gap-4 justify-center">
+<div class="w-full flex flex-wrap gap-4 justify-center" *ngIf="pokemonList">
   <app-pokemon-item
-    *ngFor="let pokemon of pokemonList"
+    *ngFor="let pokemon of pokemonList | async"
     [pokemonData]="pokemon"
   ></app-pokemon-item>
 </div>
