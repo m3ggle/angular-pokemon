@@ -1,8 +1,5 @@
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
-// import { GalleryComponent } from '../pages/gallery/gallery.component';
-// import { PokemonDetailComponent } from '../pages/pokemon-detail/pokemon-detail.component';
-// import { NotFoundComponent } from '../pages/not-found/not-found.component';
 
 const routes: Routes = [
   {
@@ -10,41 +7,25 @@ const routes: Routes = [
     redirectTo: 'gallery',
     pathMatch: 'full',
   },
-  // {
-  //   path: 'gallery',
-  //   component: GalleryComponent,
-  // },
   {
     path: 'gallery',
-    loadChildren: () =>
-      import('../pages/gallery/gallery.module').then((m) => m.GalleryModule),
+    loadComponent: () =>
+      import('../pages/gallery/gallery.component').then(
+        (m) => m.GalleryComponent
+      ),
   },
   {
     path: 'pokemon',
-    loadChildren: () =>
-      import('../pages/pokemon-detail/pokemon-detail.module').then(
-        (m) => m.PokemonDetailModule
+    loadComponent: () =>
+      import('../pages/pokemon-detail/pokemon-detail.component').then(
+        (m) => m.PokemonDetailComponent
       ),
   },
-  // {
-  //   path: 'pokemon',
-  //   component: PokemonDetailComponent,
-  //   children: [
-  //     {
-  //       path: ':id',
-  //       component: PokemonDetailComponent,
-  //     },
-  //   ],
-  // },
-  // {
-  //   path: 'not-found',
-  //   component: NotFoundComponent,
-  // },
   {
     path: 'not-found',
     loadChildren: () =>
-      import('../pages/not-found/not-found.module').then(
-        (m) => m.NotFoundModule
+      import('../pages/not-found/not-found.component').then(
+        (m) => m.NotFoundComponent
       ),
   },
   {

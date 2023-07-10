@@ -1,10 +1,5 @@
-import { Injectable, OnInit, inject } from '@angular/core';
-import {
-  Pokemon,
-  PokemonsCall,
-  PokemonsHttp,
-} from '../interfaces/pokemon.interfaces';
 import { HttpClient } from '@angular/common/http';
+import { Injectable, inject } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
@@ -14,6 +9,11 @@ import {
   of,
   switchMap,
 } from 'rxjs';
+import {
+  Pokemon,
+  PokemonsCall,
+  PokemonsHttp,
+} from '../interfaces/pokemon.interfaces';
 
 @Injectable({
   providedIn: 'root',
@@ -29,36 +29,38 @@ export class PokemonService {
     const pokeUrl = this.determineUrl(url, offset, limit);
 
     // meat of getting pokemons
-    this.http.get<PokemonsCall>(pokeUrl).pipe(
-      catchError(
-        this.handleError<PokemonsCall>(
-          `gePokemons offset=${offset} limit=${limit}`
-        )
-      ),
-      switchMap((data) => {
-        const pokeOb = data.results.map((poke) =>
-          this.getPokemonByUrl(poke.url)
-        );
+    this.http
+      .get<PokemonsCall>(pokeUrl)
+      .pipe(
+        catchError(
+          this.handleError<PokemonsCall>(
+            `gePokemons offset=${offset} limit=${limit}`
+          )
+        ),
+        switchMap((data) => {
+          const pokeOb = data.results.map((poke) =>
+            this.getPokemonByUrl(poke.url)
+          );
 
-        let currentPokis = this.pokemonsHttp.value?.results
-          ? this.pokemonsHttp.value?.results
-          : [];
+          let currentPokis = this.pokemonsHttp.value?.results
+            ? this.pokemonsHttp.value?.results
+            : [];
 
-        return forkJoin(pokeOb).pipe(
-          map((pokemonData) => ({
-            count: data.count,
-            next: data.next,
-            previous: data.previous,
-            results: [...currentPokis, ...pokemonData],
-          }))
-        );
-      }),
-      map((data) => {
-        this.pokemonsHttp.next(data);
-        return data;
-      })
-    )
-    .subscribe(console.log);
+          return forkJoin(pokeOb).pipe(
+            map((pokemonData) => ({
+              count: data.count,
+              next: data.next,
+              previous: data.previous,
+              results: [...currentPokis, ...pokemonData],
+            }))
+          );
+        }),
+        map((data) => {
+          this.pokemonsHttp.next(data);
+          return data;
+        })
+      )
+      .subscribe(console.log);
   }
 
   private determineUrl(url?: string, offset?: number, limit?: number) {

@@ -1,11 +1,9 @@
 import {
   Directive,
   ElementRef,
-  EventEmitter,
   Input,
   OnDestroy,
   OnInit,
-  Output,
   inject,
 } from '@angular/core';
 import { Subject, delay, filter } from 'rxjs';
