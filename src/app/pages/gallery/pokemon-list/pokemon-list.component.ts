@@ -1,21 +1,14 @@
-import { Component, OnInit, inject } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Observable, map } from 'rxjs';
 import { Pokemon } from 'src/app/interfaces/pokemon.interfaces';
 import { PokemonService } from 'src/app/services/pokemon.service';
 
 @Component({
   selector: 'app-pokemon-list',
   templateUrl: './pokemon-list.component.html',
-  styleUrls: ['./pokemon-list.component.css'],
 })
-export class PokemonListComponent implements OnInit {
-  public pokemonList: Pokemon[] = [];
-  private pokemonService = inject(PokemonService)
-
-  ngOnInit(): void {
-    this.pokemonService.pokemonsHttp.subscribe((newPokis) => {
-      if (newPokis !== null) {
-        this.pokemonList = newPokis.results;
-      }
-    });
-  }
+export class PokemonListComponent {
+  private pokemonService = inject(PokemonService);
+  public pokemonList: Observable<Pokemon[] | undefined> =
+    this.pokemonService.pokemonsHttp.pipe(map((data) => data?.results));
 }

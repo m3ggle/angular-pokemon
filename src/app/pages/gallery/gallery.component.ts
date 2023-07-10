@@ -4,7 +4,6 @@ import { PokemonService } from 'src/app/services/pokemon.service';
 @Component({
   selector: 'app-gallery',
   templateUrl: './gallery.component.html',
-  styleUrls: ['./gallery.component.css'],
 })
 export class GalleryComponent implements OnInit {
   private pokemonService = inject(PokemonService)

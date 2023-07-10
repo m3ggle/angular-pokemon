@@ -25,6 +25,7 @@ export class PokemonService {
   public pokemonsHttp = new BehaviorSubject<PokemonsHttp | null>(null);
 
   public getPokemons(url?: string, offset?: number, limit?: number) {
+    // console.log("ha")
     const pokeUrl = this.determineUrl(url, offset, limit);
 
     // meat of getting pokemons
@@ -56,8 +57,8 @@ export class PokemonService {
         this.pokemonsHttp.next(data);
         return data;
       })
-    );
-    // .subscribe(console.log);
+    )
+    .subscribe(console.log);
   }
 
   private determineUrl(url?: string, offset?: number, limit?: number) {
