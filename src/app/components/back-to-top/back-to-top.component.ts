@@ -5,6 +5,10 @@ import { Component } from '@angular/core';
   selector: 'app-back-to-top',
   templateUrl: './back-to-top.component.html',
   standalone: true,
-  imports: [CommonModule]
+  imports: [CommonModule],
 })
-export class BackToTopComponent {}
+export class BackToTopComponent {
+  public onMoveToTop() {
+    window.scroll(0, 0);
+  }
+}

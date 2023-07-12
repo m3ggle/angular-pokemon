@@ -1,0 +1,64 @@
+<div *ngIf="pokemon !== null" class="w-full flex flex-col py-12 px-3">
+  <div class="w-full flex gap-12">
+    <img
+      class="w-[500px] h-[500px]"
+      [src]="pokemon.sprites.front_default"
+      [alt]="'default' + pokemon.name + 'visual'"
+      width="500"
+      height="500"
+    />
+    <div class="w-full flex flex-col gap-12">
+      <div class="flex gap-6">
+        <div
+          class="w-fit h-fit px-6 py-4 rounded-md bg-white/20 shadow flex flex-col gap-y-2"
+        >
+          <span class="text-sm">Name</span>
+          <span class="font-semibold text-4xl">{{
+            pokemon.name | titlecase
+          }}</span>
+        </div>
+        <div
+          class="w-fit h-fit px-6 py-4 rounded-md bg-white/20 shadow flex flex-col gap-y-2"
+        >
+          <span class="text-sm">Base XP</span>
+          <span class="font-semibold text-4xl">{{
+            pokemon.base_experience
+          }}</span>
+        </div>
+      </div>
+      <div class="flex flex-wrap gap-6">
+        <div
+          *ngFor="let stat of pokemon.stats"
+          class="w-[160px] h-[92px] px-6 py-4 rounded-md bg-white/20 shadow flex flex-col gap-y-2"
+        >
+          <span class="text-sm">{{ stat.stat.name }}</span>
+          <span class="font-semibold text-2xl">{{ stat.base_stat }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="flex gap-6">
+    <a [routerLink]="['/pokemon/', pokemon.id - 1]">
+      <button
+        [disabled]="pokemon.id === 1"
+        class="w-full text-center px-6 py-4 rounded-md border-[1px] border-white hover:bg-white/30 hover:border-white/30 hover:font-semibold shadow-md"
+      >
+        Previous
+      </button>
+    </a>
+    <a routerLink="/gallery">
+      <button
+        class="w-fit text-center px-6 py-4 rounded-md border-[1px] border-white hover:bg-white/30 hover:border-white/30 hover:font-semibold shadow-md"
+      >
+        Gallery
+      </button>
+    </a>
+    <a [routerLink]="['/pokemon/', pokemon.id + 1]">
+      <button
+        class="w-full text-center px-6 py-4 rounded-md border-[1px] border-white hover:bg-white/30 hover:font-semibold shadow-md"
+      >
+        Next
+      </button>
+    </a>
+  </div>
+</div>

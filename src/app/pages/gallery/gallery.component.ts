@@ -1,8 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, inject } from '@angular/core';
+import { BackToTopComponent } from 'src/app/components/back-to-top/back-to-top.component';
+import { SearchComponent } from 'src/app/components/search/search.component';
 import { IntersectionModule } from 'src/app/directives/intersection/intersection.module';
-import { BackToTopComponent } from 'src/app/generalComponents/back-to-top/back-to-top.component';
-import { SearchComponent } from 'src/app/generalComponents/search/search.component';
 import { PokemonService } from 'src/app/services/pokemon.service';
 import { PokemonListComponent } from './pokemon-list/pokemon-list.component';
 
@@ -22,7 +22,9 @@ export class GalleryComponent implements OnInit {
   private pokemonService = inject(PokemonService);
 
   ngOnInit(): void {
-    this.pokemonService.getPokemons();
+    if (this.pokemonService.pokemonsHttp.value === null) {
+      this.pokemonService.getPokemons();
+    }
   }
 
   public onIntersected() {

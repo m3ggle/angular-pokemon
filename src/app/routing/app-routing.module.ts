@@ -16,16 +16,16 @@ const routes: Routes = [
   },
   {
     path: 'pokemon',
-    loadComponent: () =>
-      import('../pages/pokemon-detail/pokemon-detail.component').then(
-        (m) => m.PokemonDetailComponent
+    loadChildren: () =>
+      import('../pages/pokemon-detail/pokemon-detail.module').then(
+        (m) => m.PokemonDetailModule
       ),
   },
   {
     path: 'not-found',
     loadChildren: () =>
-      import('../pages/not-found/not-found.component').then(
-        (m) => m.NotFoundComponent
+      import('../pages/not-found/not-found.module').then(
+        (m) => m.NotFoundModule
       ),
   },
   {

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+// import { HttpClient } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
 import {
   BehaviorSubject,
@@ -14,13 +14,15 @@ import {
   PokemonsCall,
   PokemonsHttp,
 } from '../interfaces/pokemon.interfaces';
+import { CacheService } from './cache.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PokemonService {
   private readonly pokemonPrefix = 'https://pokeapi.co/api/v2/pokemon';
-  private http = inject(HttpClient);
+  // private http = inject(HttpClient);
+  private cacheService = inject(CacheService);
 
   public pokemonsHttp = new BehaviorSubject<PokemonsHttp | null>(null);
 
@@ -29,8 +31,10 @@ export class PokemonService {
     const pokeUrl = this.determineUrl(url, offset, limit);
 
     // meat of getting pokemons
-    this.http
-      .get<PokemonsCall>(pokeUrl)
+    // this.http
+    //   .get<PokemonsCall>(pokeUrl)
+    this.cacheService
+      .httpWithCache<PokemonsCall>(pokeUrl)
       .pipe(
         catchError(
           this.handleError<PokemonsCall>(
@@ -79,15 +83,17 @@ export class PokemonService {
   }
 
   public getPokemonById(id: number): Observable<Pokemon> {
-    const url = `${this.pokemonPrefix}/${id}`;
-    return this.http.get<Pokemon>(url).pipe(
+    const url = `${this.pokemonPrefix}/${id}/`;
+    // return this.http.get<Pokemon>(url).pipe(
+    return this.cacheService.httpWithCache<Pokemon>(url).pipe(
       // clean up function
       catchError(this.handleError<Pokemon>(`gePokemonByID id=${id}`))
     );
   }
 
   public getPokemonByUrl(url: string): Observable<Pokemon> {
-    return this.http.get<Pokemon>(url).pipe(
+    // return this.http.get<Pokemon>(url).pipe(
+    return this.cacheService.httpWithCache<Pokemon>(url).pipe(
       // clean up function
       catchError(this.handleError<Pokemon>(`gePokemonByUrl url=${url}`))
     );
