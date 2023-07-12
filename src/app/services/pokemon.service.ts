@@ -10,6 +10,7 @@ import {
   mergeMap,
   of,
   scan,
+  shareReplay,
   switchMap,
 } from 'rxjs';
 import {
@@ -31,24 +32,45 @@ export class PokemonService {
   private nextUrl?: string;
 
   public url$ = this.url$$.asObservable();
+  // Create an observable that depends on URL changes
   public pokemonsHttp = this.url$$.pipe(
+    // if the URL is updated (see `fetchNextPokemons`)
+    // then we want to fetch the new URL.
     mergeMap(url => {
       // meat of getting pokemons
     return this.http
       .get<PokemonsCall>(url)
-    // this.<PokemonsCall>(pokeUrl)
       .pipe(
+        // The response contains a bunch of Pokemon Detail URLs
+        // that we need to fetch now
         mergeMap((data) => {
+          // create a list of observables where each observable
+          // makes one http request to a specific pokemon
           const pokeOb = data.results.map((poke) =>
             this.getPokemonByUrl(poke.url)
           );
+          // remember the next URL for `fetchNextPokemons`
           this.nextUrl = data.next;
+          // combine the observables and return a list of the results
           return forkJoin(pokeOb);
         })
       );
     }),
+
+    // Combine newly fetched pokemons with the previous list
+    // and return the new resulting array.
     scan((prev, current) => {
       return [...prev, ...current];
+    }),
+
+    // Use Replay to re-emit the latest value on
+    // any further subscriptions
+    shareReplay({
+      // Only emit the LATEST value, not the whole stream again
+      bufferSize: 1,
+      // false will keep the stream active altough nobdy is subscribed
+      // this ensures that our existing pokemon list won't disappear!
+      refCount: false,
     })
   )
 
