@@ -3,10 +3,13 @@ import { Injectable, inject } from '@angular/core';
 import {
   BehaviorSubject,
   Observable,
+  Subject,
   catchError,
   forkJoin,
   map,
+  mergeMap,
   of,
+  scan,
   switchMap,
 } from 'rxjs';
 import {
@@ -23,58 +26,47 @@ import { HttpClient } from '@angular/common/http';
 export class PokemonService {
   private readonly pokemonPrefix = 'https://pokeapi.co/api/v2/pokemon';
   private http = inject(HttpClient);
-  // private cacheService = inject(CacheService);
 
-  public pokemonsHttp = new BehaviorSubject<PokemonsHttp | null>(null);
+  private url$$ = new Subject<string>();
+  private nextUrl?: string;
 
-  public getPokemons(url?: string, offset?: number, limit?: number) {
-    // console.log("ha")
-    const pokeUrl = this.determineUrl(url, offset, limit);
-
-    // meat of getting pokemons
-    this.http
-      .get<PokemonsCall>(pokeUrl)
+  public url$ = this.url$$.asObservable();
+  public pokemonsHttp = this.url$$.pipe(
+    mergeMap(url => {
+      // meat of getting pokemons
+    return this.http
+      .get<PokemonsCall>(url)
     // this.<PokemonsCall>(pokeUrl)
       .pipe(
-        catchError(
-          this.handleError<PokemonsCall>(
-            `gePokemons offset=${offset} limit=${limit}`
-          )
-        ),
-        switchMap((data) => {
+        mergeMap((data) => {
           const pokeOb = data.results.map((poke) =>
             this.getPokemonByUrl(poke.url)
           );
-
-          let currentPokis = this.pokemonsHttp.value?.results
-            ? this.pokemonsHttp.value?.results
-            : [];
-
-          return forkJoin(pokeOb).pipe(
-            map((pokemonData) => ({
-              count: data.count,
-              next: data.next,
-              previous: data.previous,
-              results: [...currentPokis, ...pokemonData],
-            }))
-          );
-        }),
-        map((data) => {
-          this.pokemonsHttp.next(data);
-          return data;
+          this.nextUrl = data.next;
+          return forkJoin(pokeOb);
         })
-      )
-      .subscribe(console.log);
+      );
+    }),
+    scan((prev, current) => {
+      return [...prev, ...current];
+    })
+  )
+
+  constructor() {
+    this.fetchNextPokemons();
+  }
+
+  public fetchNextPokemons() {
+    // console.log("ha")
+    const pokeUrl = this.determineUrl(this.nextUrl);
+    this.url$$.next(pokeUrl);
+
   }
 
   private determineUrl(url?: string, offset?: number, limit?: number) {
     let pokeUrl = this.pokemonPrefix;
     if (url === undefined) {
-      if (offset === undefined || limit === undefined) {
-        pokeUrl = pokeUrl + '?offset=0&limit=0';
-      } else {
-        pokeUrl = pokeUrl + `?offset=${offset}&limit=${limit}`;
-      }
+      pokeUrl = pokeUrl + '?offset=0&limit=0';
     } else {
       pokeUrl = url;
     }
