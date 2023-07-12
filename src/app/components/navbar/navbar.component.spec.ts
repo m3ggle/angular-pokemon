@@ -47,14 +47,13 @@ describe('NavbarComponent', () => {
   });
 
   // now all about routes
-  it("should navigate to the default path = '/gallery'", waitForAsync(() => {
+  it("should navigate to the default path = '/gallery'", async () => {
     fixture.detectChanges(); // trigger the change detection
 
-    fixture.whenStable().then(() => {
-      expect(location.path()).toBe('/gallery');
-    });
-    // used to resume testing after events triggered async activity or async change detection
-  }));
+    await fixture.whenStable()
+
+    expect(location.path()).toBe('/gallery');
+  });
 
   it('should navigate', waitForAsync(() => {
     // arrange
