@@ -8,14 +8,13 @@ import { NavbarComponent } from './navbar.component';
 
 //https://www.youtube.com/watch?v=BWjGPR2TYD4
 
-describe('Navbar3', () => {
+describe('NavbarComponent', () => {
   let router: Router;
   let fixture: ComponentFixture<NavbarComponent>;
   let location: Location;
   let el: DebugElement; // for accessing the dom element
 
   beforeEach(waitForAsync(() => {
-    // beforeEach(() => {
     TestBed.configureTestingModule({
       imports: [
         NavbarComponent,
@@ -25,7 +24,6 @@ describe('Navbar3', () => {
           { path: 'pokemon/:id', component: NavbarComponent },
         ]),
       ],
-      // declarations: [NavbarComponent],
       providers: [Location],
     }).compileComponents();
   }));
@@ -59,13 +57,17 @@ describe('Navbar3', () => {
   }));
 
   it('should navigate', waitForAsync(() => {
+    // arrange
     fixture.detectChanges();
     let allLinkElements = el.queryAll(By.css('a'));
     const pokemon1Link = allLinkElements.filter(
       (a) => a.nativeElement.innerText === 'Pokemon 1'
     )[0];
 
+    // act
     pokemon1Link.nativeElement.click();
+
+    // assert
     fixture.whenStable().then(() => {
       expect(location.path())
         .withContext('from `/` to `/pokemon/1`')
@@ -74,13 +76,17 @@ describe('Navbar3', () => {
   }));
 
   it('should navigate', waitForAsync(() => {
+    // arrange
     fixture.detectChanges();
     let allLinkElements = el.queryAll(By.css('a'));
     const notFoundLink = allLinkElements.filter((a) => {
       return a.nativeElement.innerText === 'Not Found';
     })[0];
 
+    // act
     notFoundLink.nativeElement.click();
+
+    // assert
     fixture.whenStable().then(() => {
       expect(location.path())
         .withContext('from `/` to `/not-found`')
@@ -89,14 +95,17 @@ describe('Navbar3', () => {
   }));
 
   it('should navigate', waitForAsync(() => {
+    // arrange
     fixture.detectChanges();
-
     let allLinkElements = el.queryAll(By.css('a'));
     const galleryLink = allLinkElements.filter(
       (a) => a.nativeElement.innerText === 'Gallery'
     )[0];
 
+    // act
     galleryLink.nativeElement.click();
+
+    // assert
     fixture.whenStable().then(() => {
       expect(location.path())
         .withContext('from `/` to `/gallery`')
