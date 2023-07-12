@@ -1,11 +1,13 @@
 import {
+  HttpClient,
   HttpEvent,
   HttpHandler,
   HttpInterceptor,
   HttpRequest,
+  HttpResponse,
 } from '@angular/common/http';
 import { Injectable, inject } from '@angular/core';
-import { Observable, of, tap } from 'rxjs';
+import { Observable, of, shareReplay, tap } from 'rxjs';
 import { HTTP_CLIENT_TOKEN } from '../app.module';
 
 interface Cache {
@@ -21,7 +23,7 @@ interface Cache {
 export class CacheService implements HttpInterceptor {
   private cache: Cache[] = [];
   // private http = inject(HttpClient);
-  private http = inject(HTTP_CLIENT_TOKEN);
+  private http = inject(HttpClient);
 
   // todo: make it work -_-
   intercept(
@@ -31,19 +33,18 @@ export class CacheService implements HttpInterceptor {
     if (req.method === 'GET') {
       const cachedRequests = this.cache.filter((call) => call.request === req.url);
       if (cachedRequests.length === 1) {
-        return of(cachedRequests[0].data);
+        return cachedRequests[0].data;
       }
 
-      return next.handle(req).pipe(
-        tap((response) => {
-          this.cache.push({
-            timestamp: Date.now().toString(),
-            relieved: '',
-            data: response,
-            request: req.url,
-          });
-        })
-      );
+      const requestRef$ = next.handle(req).pipe(shareReplay(1));
+
+      this.cache.push({
+        timestamp: Date.now().toString(),
+        relieved: '',
+        data: requestRef$,
+        request: req.url,
+      });
+      return requestRef$;
     }
     throw new Error('Method not implemented.');
   }
