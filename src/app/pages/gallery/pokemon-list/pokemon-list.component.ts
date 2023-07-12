@@ -13,6 +13,5 @@ import { PokemonItemComponent } from './pokemon-item/pokemon-item.component';
 })
 export class PokemonListComponent {
   private pokemonService = inject(PokemonService);
-  public pokemonList: Observable<Pokemon[] | undefined> =
-    this.pokemonService.pokemonsHttp.pipe(map((data) => data?.results));
+  public pokemonList: Observable<Pokemon[] | undefined> = this.pokemonService.pokemonsHttp;
 }

@@ -18,18 +18,9 @@ import { PokemonListComponent } from './pokemon-list/pokemon-list.component';
     IntersectionModule,
   ],
 })
-export class GalleryComponent implements OnInit {
+export class GalleryComponent {
   private pokemonService = inject(PokemonService);
-
-  ngOnInit(): void {
-    if (this.pokemonService.pokemonsHttp.value === null) {
-      this.pokemonService.getPokemons();
-    }
-  }
-
   public onIntersected() {
-    this.pokemonService.getPokemons(
-      this.pokemonService.pokemonsHttp.value?.next
-    );
+    this.pokemonService.fetchNextPokemons();
   }
 }
