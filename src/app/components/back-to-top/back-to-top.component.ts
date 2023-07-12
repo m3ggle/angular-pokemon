@@ -1,5 +1,10 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, Inject, InjectionToken, inject } from '@angular/core';
+
+export const WINDOW_TOKEN = new InjectionToken<Window>("global window", {
+  providedIn: 'root',
+  factory: () => window,
+})
 
 @Component({
   selector: 'app-back-to-top',
@@ -8,7 +13,9 @@ import { Component } from '@angular/core';
   imports: [CommonModule],
 })
 export class BackToTopComponent {
+  private readonly windowRef = inject(WINDOW_TOKEN);
+
   public onMoveToTop() {
-    window.scroll(0, 0);
+    this.windowRef.scroll(0, 0);
   }
 }

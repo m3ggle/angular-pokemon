@@ -1,57 +1,47 @@
 import { HttpClient, HttpHandler } from '@angular/common/http';
-import { TestBed } from '@angular/core/testing';
+import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { GalleryComponent } from 'src/app/pages/gallery/gallery.component';
 import { PokemonService } from 'src/app/services/pokemon.service';
-import { BackToTopComponent } from './back-to-top.component';
+import { BackToTopComponent, WINDOW_TOKEN } from './back-to-top.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { By } from '@angular/platform-browser';
 
 // not really isolated
 describe('BackToTopComponent', () => {
-  beforeEach(() =>
+  let windowFakeRef: any;
+  let fixture: ComponentFixture<BackToTopComponent>;
+  let component: BackToTopComponent;
+  beforeEach(() =>{
+    windowFakeRef = {
+      scroll: jasmine.createSpy('scroll'),
+    };
+
     TestBed.configureTestingModule({
       imports: [BackToTopComponent],
-      providers: [PokemonService, HttpClient, HttpHandler],
+      providers: [
+        {
+          provide: WINDOW_TOKEN,
+          useValue: windowFakeRef,
+        }
+      ],
     })
-  );
 
-  it('should create the itself', () => {
-    // arrange
-    const fixture = TestBed.createComponent(BackToTopComponent);
-    const btt = fixture.componentInstance;
-
-    // act
-
-    // assert
-    expect(btt).toBeTruthy();
+    fixture = TestBed.createComponent(BackToTopComponent);
+    component = fixture.componentInstance;
   });
 
-  it('#onMoveToTop() should scroll to the top', () => {
-    // arrange
-    // with gallery component
-    const fixture = TestBed.createComponent(GalleryComponent);
-    const fixture2 = TestBed.createComponent(BackToTopComponent);
-    const gallery = fixture.componentInstance;
-    const btt = fixture2.componentInstance;
+  it('should create the itself', () => {
+    expect(component).toBeTruthy();
+  });
 
-    // back  alone 
-    // const fixture = TestBed.createComponent(BackToTopComponent);
-    // const btt = fixture.componentInstance;
+  it('should scroll to 0,0 onMoveToTop', () => {
+    component.onMoveToTop();
 
-    // act
-    // change the window scroll position from default (0, 0) to (0, 40) => scroll down
-    window.scroll(0, 40); 
-    
-    // ! for debugging, check if it really changed => does not
-    // console.log(window.scrollY)
+    expect(windowFakeRef.scroll).toHaveBeenCalledWith(0, 0);
+  });
 
-    // scroll to the top of the window
-    // btt.onMoveToTop();
-
-    // assert
-    // check if it scrolled down
-    expect(window.scrollY).withContext("scrolled down at first").toBe(40);
-    
-    // check after click if it scrolled to the top
-    btt.onMoveToTop()
-    expect(window.scrollY).withContext("scrolled to the top after click").toBe(0);
+  it('should scroll to 0,0 on', () => {
+    fixture.debugElement.query(By.css('button')).triggerEventHandler('click');
+    expect(windowFakeRef.scroll).toHaveBeenCalledWith(0, 0);
   });
 });
